@@ -12,32 +12,15 @@ const draw = (
     ctx: CanvasRenderingContext2D;
     width: number;
     height: number;
-    clear: () => void;
-    translate: (x: number, y: number) => void;
-    rotate: (a: number) => void;
   }) => void
 ) => {
   const width = canvas.width;
   const height = canvas.height;
-  // ctx.translate(width / 2, height / 2);
-  // ctx.scale(1, -1);
 
-  const clear = () => {
-    ctx.clearRect(0, 0, width, height);
-  };
-
-  const translate = (x: number, y: number) => {
-    ctx.translate(x, y);
-  };
-
-  const rotate = (a: number) => {
-    ctx.rotate(a);
-  };
-
-  fn({ ctx, width, height, clear, translate, rotate });
+  fn({ ctx, width, height });
 };
 
-draw(({ ctx, height, width, clear, translate, rotate }) => {
+draw(({ ctx, height, width }) => {
   const arrowX = width / 2;
   const arrowY = height / 2;
 
@@ -47,11 +30,12 @@ draw(({ ctx, height, width, clear, translate, rotate }) => {
   let dy = 0;
 
   function render() {
-    clear();
+    ctx.clearRect(0, 0, width, height);
 
     ctx.save();
-    translate(arrowX, arrowY);
-    rotate(angle);
+
+    ctx.translate(arrowX, arrowY);
+    ctx.rotate(angle);
 
     ctx.beginPath();
     ctx.moveTo(20, 0);
