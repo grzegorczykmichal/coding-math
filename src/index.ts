@@ -12,61 +12,68 @@ const draw = (
     ctx: CanvasRenderingContext2D;
     width: number;
     height: number;
+    clear: () => void;
+    translate: (x: number, y: number) => void;
+    rotate: (a: number) => void;
   }) => void
 ) => {
   const width = canvas.width;
   const height = canvas.height;
-  ctx.translate(width / 2, height / 2);
-  ctx.scale(1, -1);
-  fn({ ctx, width, height });
+  // ctx.translate(width / 2, height / 2);
+  // ctx.scale(1, -1);
+
+  const clear = () => {
+    ctx.clearRect(0, 0, width, height);
+  };
+
+  const translate = (x: number, y: number) => {
+    ctx.translate(x, y);
+  };
+
+  const rotate = (a: number) => {
+    ctx.rotate(a);
+  };
+
+  fn({ ctx, width, height, clear, translate, rotate });
 };
 
-// draw(({ ctx }) => {
-//   for (let i = 0; i < Math.PI * 2; i += 0.01) {
-//     // const x = i * 100;
-//     // const y = Math.sin(i) * 100;
-//     ctx.fillRect(0, 0, 50, 50);
-//   }
-// });
+draw(({ ctx, height, width, clear, translate, rotate }) => {
+  const arrowX = width / 2;
+  const arrowY = height / 2;
 
-draw(({ ctx, height, width }) => {
-  const cY = 0; //height * 0.5;
-  const cX = 0; //width * 0.5;
-  const offsetY = height * 0.4;
-  const offsetX = -height * 0.4;
-  const offsetA = 0.4;
-  const speed = 0.009;
   let angle = 0;
+
+  let dx = 0;
+  let dy = 0;
+
   function render() {
-    const y = cY + Math.sin(angle) * offsetY;
-    const x = cX + Math.cos(angle) * offsetX;
-    const a = cX + Math.sin(angle) * offsetA;
+    clear();
 
-    ctx.clearRect(-width, -height, 2 * width, 2 * height);
-    ctx.beginPath();
-    ctx.arc(cX, y, 50, 0, Math.PI * 2, false);
-    ctx.fillStyle = "rgba(0,255,0,0.5)";
-    ctx.fill();
+    ctx.save();
+    translate(arrowX, arrowY);
+    rotate(angle);
 
     ctx.beginPath();
-    ctx.arc(x, cY, 50, 0, Math.PI * 2, false);
-    ctx.fillStyle = "rgba(255,0,0,0.5)";
-    ctx.fill();
+    ctx.moveTo(20, 0);
+    ctx.lineTo(-20, 0);
+    ctx.moveTo(20, 0);
+    ctx.lineTo(10, -10);
+    ctx.moveTo(20, 0);
+    ctx.lineTo(10, 10);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(x, y, 50, 0, Math.PI * 2, false);
-    ctx.fillStyle = "rgba(0,0,255,0.5)";
-    ctx.fill();
+    ctx.restore();
 
-    ctx.beginPath();
-    ctx.arc(-x, y, 50, 0, Math.PI * 2, false);
-    ctx.fillStyle = `rgba(0,255,255,${Math.abs(a)})`;
-    ctx.fill();
-
-    console.log(a);
-
-    angle += speed;
     requestAnimationFrame(render);
   }
+
+  document.addEventListener("mousemove", e => {
+    dx = e.clientX - arrowX;
+    dy = e.clientY - arrowY;
+    angle = Math.atan2(dy, dx);
+  });
+
   render();
 });

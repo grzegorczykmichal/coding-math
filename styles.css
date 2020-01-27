@@ -6,4 +6,5 @@ html {
 
 canvas {
   background-color: #486ade;
+  display: block;
 }
