@@ -4,60 +4,89 @@ const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
 ) as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const WIDTH = window.innerWidth;
+const HEIGHT = window.innerHeight;
 
-const draw = (
-  fn: (params: {
-    ctx: CanvasRenderingContext2D;
-    width: number;
-    height: number;
-  }) => void
-) => {
-  const width = canvas.width;
-  const height = canvas.height;
+canvas.width = WIDTH;
+canvas.height = HEIGHT;
 
-  fn({ ctx, width, height });
-};
+// const draw = (
+//   fn: (params: {
+//     ctx: CanvasRenderingContext2D;
+//     width: number;
+//     height: number;
+//   }) => void
+// ) => {
+//   const width = canvas.width;
+//   const height = canvas.height;
 
-draw(({ ctx, height, width }) => {
-  const arrowX = width / 2;
-  const arrowY = height / 2;
+//   fn({ ctx, width, height });
+// };
 
-  let angle = 0;
+const arrowX = canvas.width / 2;
+const arrowY = canvas.height / 2;
 
-  let dx = 0;
-  let dy = 0;
+let adX = 0;
+let adY = 0;
 
-  function render() {
-    ctx.clearRect(0, 0, width, height);
+let angle = 0;
 
-    ctx.save();
+let dx = 0;
+let dy = 0;
 
-    ctx.translate(arrowX, arrowY);
-    ctx.rotate(angle);
+const keys = new Set([]);
+// draw(({ ctx, height, width }) => {
+function render() {
+  requestAnimationFrame(render);
 
-    ctx.beginPath();
-    ctx.moveTo(20, 0);
-    ctx.lineTo(-20, 0);
-    ctx.moveTo(20, 0);
-    ctx.lineTo(10, -10);
-    ctx.moveTo(20, 0);
-    ctx.lineTo(10, 10);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#FFFFFF";
-    ctx.stroke();
-
-    ctx.restore();
-
-    requestAnimationFrame(render);
-  }
-
-  document.addEventListener("mousemove", e => {
-    dx = e.clientX - arrowX;
-    dy = e.clientY - arrowY;
-    angle = Math.atan2(dy, dx);
+  keys.forEach(k => {
+    if (k === "w") {
+      adY -= 10;
+    }
+    if (k === "a") {
+      adX -= 10;
+    }
+    if (k === "s") {
+      adY += 10;
+    }
+    if (k === "d") {
+      adX += 10;
+    }
   });
 
-  render();
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+  ctx.save();
+
+  ctx.translate(arrowX + adX, arrowY + adY);
+  ctx.rotate(angle);
+
+  ctx.beginPath();
+  ctx.moveTo(20, 0);
+  ctx.lineTo(-20, 0);
+  ctx.moveTo(20, 0);
+  ctx.lineTo(10, -10);
+  ctx.moveTo(20, 0);
+  ctx.lineTo(10, 10);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#FFFFFF";
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+render();
+
+document.addEventListener("mousemove", e => {
+  dx = e.clientX - arrowX - adX;
+  dy = e.clientY - arrowY - adY;
+  angle = Math.atan2(dy, dx);
+});
+
+document.addEventListener("keyup", e => {
+  keys.delete(e.key);
+});
+
+document.addEventListener("keydown", e => {
+  keys.add(e.key);
 });
